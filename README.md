@@ -66,7 +66,7 @@ In your build.gradle(.kts) define:
 testImplementation("io.github.cdsap:td-paparazzi-ext:0.1")
 ```
 
-### Update your Paparazzi tests to use the next Html writer
+### Update your Paparazzi tests to use the new Html writer `TDPaparazziHandlerProvider`
 
 ```
     @get:Rule
@@ -196,6 +196,7 @@ abstract class MergeOutputTask : DefaultTask() {
     }
 }
 ```
+https://github.com/cdsap/PaparazziTestDistributionExtension/blob/main/android-library/build.gradle.kts#L72
 
 ### Register the Merging task
 
@@ -220,24 +221,25 @@ androidComponents {
 }
 
 ```
-
+https://github.com/cdsap/PaparazziTestDistributionExtension/blob/main/android-library/build.gradle.kts#L53
 ## Sample
 
-This repository includes the project `sample` with the complete implementation of the extension
+This repository includes the project `sample` with the complete implementation of the extension:
+https://github.com/cdsap/PaparazziTestDistributionExtension/blob/main/android-library/build.gradle.kts
 
 ## Output
 
 ### Individual reports
 
-![](images/individualreport.png)
+![](resources/individualreport.png)
 
 ### Merged reports
 
-![](images/mergedreport.png)
+![](resources/mergedreport.png)
 
 ### Example output after merging the individual reports
 
-![](images/outputwithtd.png)
+![](resources/outputwithtd.png)
 
 ## Notes
 
