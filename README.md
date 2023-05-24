@@ -4,11 +4,13 @@ Compatibility library to use Paparazzi with Gradle Enterprise Test Distribution.
 
 ### Paparazzi
 https://github.com/cashapp/paparazzi
+
 Paparazzi is an Android library that allows render your application screens without a physical
 device or emulator.
 
 ### Gradle Enterprise Test Distribution
 https://docs.gradle.com/enterprise/test-distribution/
+
 Historical test execution data provided by Gradle Enterprise is used to create balanced partitions
 of similar expected execution times in order to optimize distribution across remote agents.
 The tests and their supporting files are transferred to each agent and executed, with their
