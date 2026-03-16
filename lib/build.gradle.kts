@@ -6,11 +6,11 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.1"
+version = "0.2.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 configure<JavaPluginExtension> {
@@ -19,13 +19,20 @@ configure<JavaPluginExtension> {
 }
 
 dependencies {
-    implementation("app.cash.paparazzi:paparazzi:1.2.0")
+    implementation("app.cash.paparazzi:paparazzi:2.0.0-alpha04")
     implementation("com.squareup.okio:okio:3.1.0")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.jcodec:jcodec-javase:0.2.5")
-    implementation("com.squareup.moshi:moshi-adapters:1.13.0")
-    implementation("com.squareup.moshi:moshi:1.13.0")
-    implementation("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+    implementation("com.squareup.moshi:moshi-adapters:1.15.2")
+    implementation("com.squareup.moshi:moshi:1.15.2")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 

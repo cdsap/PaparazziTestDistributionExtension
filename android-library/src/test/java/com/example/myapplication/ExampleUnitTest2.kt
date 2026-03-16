@@ -12,6 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import app.cash.paparazzi.Paparazzi
 import io.github.cdsap.td.paparazzi.TDPaparazzi
 import org.junit.Test
 
@@ -23,18 +24,18 @@ import org.junit.Rule
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class ExampleUnitTest2 {
     @get:Rule
     val paparazzi = TDPaparazzi(maxPercentDifference = 0.1)
 
     @Test
     fun compose() {
-        paparazzi.snapshot { HelloPaparazzi() }
+        paparazzi.snapshot { HelloPaparazzi2() }
     }
 }
 @Suppress("TestFunctionName")
 @Composable
-fun HelloPaparazzi() {
+fun HelloPaparazzi2() {
     val text = "Hello, Paparazzi"
     Column(
         Modifier

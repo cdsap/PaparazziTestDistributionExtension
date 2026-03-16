@@ -271,14 +271,14 @@ internal val filenameSafeChars = CharMatcher.inRange('a', 'z')
     .or(CharMatcher.anyOf("_-.~@^()[]{}:;,"))
 
 internal fun String.sanitizeForFilename(): String? {
-    return filenameSafeChars.negate().replaceFrom(toLowerCase(Locale.US), '_')
+    return filenameSafeChars.negate().replaceFrom(lowercase(Locale.US), '_')
 }
 internal fun Snapshot.toFileName(
     delimiter: String = "_",
     extension: String
 ): String {
     val formattedLabel = if (name != null) {
-        "$delimiter${name!!.toLowerCase(Locale.US).replace("\\s".toRegex(), delimiter)}"
+        "$delimiter${name!!.lowercase(Locale.US).replace("\\s".toRegex(), delimiter)}"
     } else {
         ""
     }

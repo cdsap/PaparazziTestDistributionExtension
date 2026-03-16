@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("gradle-plugin")
     repositories {
         google()
         mavenCentral()
@@ -6,15 +7,16 @@ pluginManagement {
     }
 }
 plugins {
-    id("com.gradle.common-custom-user-data-gradle-plugin") version "1.8.1"
-    id("com.gradle.enterprise") version "3.13"
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
+    id("com.gradle.develocity") version "4.3.2"
 }
 
-gradleEnterprise {
+develocity {
     server = "http://ge.solutions-team.gradle.com"
     allowUntrustedServer = true
     buildScan {
-        publishAlways()
+        uploadInBackground = true
+        publishing.onlyIf { true }
     }
 }
 dependencyResolutionManagement {
