@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     id("org.jetbrains.kotlin.jvm")
+    id("com.vanniktech.maven.publish") version "0.36.0"
     `maven-publish`
     `signing`
 }
@@ -11,11 +12,6 @@ version = "0.2.0"
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-}
-
-configure<JavaPluginExtension> {
-    withJavadocJar()
-    withSourcesJar()
 }
 
 dependencies {
@@ -35,63 +31,32 @@ tasks.test {
     useJUnitPlatform()
 }
 
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.2.0")
 
-publishing {
-    repositories {
-        maven {
-            name = "Snapshots"
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-
-            credentials {
-                username = System.getenv("USERNAME_SNAPSHOT")
-                password = System.getenv("PASSWORD_SNAPSHOT")
+    pom {
+        scm {
+            connection.set("scm:git:git://github.com/cdsap/PaparazziTestDistributionExtension/")
+            url.set("https://github.com/cdsap/PaparazziTestDistributionExtension/")
+        }
+        name.set("td-paparazzi-ext")
+        url.set("https://github.com/cdsap/PaparazziTestDistributionExtension/")
+        description.set(
+            "Extension to make compatible Paparazzi html output reports with Develocity Test Distribution"
+        )
+        licenses {
+            license {
+                name.set("The MIT License (MIT)")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
             }
         }
-        maven {
-            name = "Release"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-
-            credentials {
-                username = System.getenv("USERNAME_SNAPSHOT")
-                password = System.getenv("PASSWORD_SNAPSHOT")
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("libPublication") {
-            from(components["java"])
-            artifactId = "td-paparazzi-ext"
-            versionMapping {
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-                usage("java-runtime") {
-                    fromResolutionResult()
-                }
-            }
-            pom {
-                scm {
-                    connection.set("scm:git:git://github.com/cdsap/PaparazziTestDistributionExtension/")
-                    url.set("https://github.com/cdsap/PaparazziTestDistributionExtension/")
-                }
-                name.set("td-paparazzi-ext")
-                url.set("https://github.com/cdsap/PaparazziTestDistributionExtension/")
-                description.set(
-                    "Extension to make compatible Paparazzi html output reports with Gradle Enterprise Test Distribution"
-                )
-                licenses {
-                    license {
-                        name.set("The MIT License (MIT)")
-                        url.set("https://opensource.org/licenses/MIT")
-                        distribution.set("repo")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("cdsap")
-                        name.set("Inaki Villar")
-                    }
-                }
+        developers {
+            developer {
+                id.set("cdsap")
+                name.set("Inaki Villar")
             }
         }
     }
