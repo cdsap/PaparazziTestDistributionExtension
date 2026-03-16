@@ -12,8 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import app.cash.paparazzi.Paparazzi
-import io.github.cdsap.td.paparazzi.TDPaparazziHandlerProvider
+import io.github.cdsap.td.paparazzi.TDPaparazzi
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -26,9 +25,7 @@ import org.junit.Rule
  */
 class ExampleUnitTest {
     @get:Rule
-    val paparazzi = Paparazzi(
-        snapshotHandler = TDPaparazziHandlerProvider().determineHandler(0.1)
-    )
+    val paparazzi = TDPaparazzi(maxPercentDifference = 0.1)
 
     @Test
     fun compose() {
