@@ -33,7 +33,7 @@ abstract class MergePaparazziOutputsTask : DefaultTask() {
     @TaskAction
     fun merge() {
         val inputDir = inputDirectory.get().asFile
-        if (inputDir.walkTopDown().count() <= 1) return
+        if (inputDir.list()?.isNotEmpty() != true) return
 
         val outputDir = outputDirectory.get().asFile
         cleanOutputDirectories(outputDir)
