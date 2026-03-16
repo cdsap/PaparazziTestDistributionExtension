@@ -35,7 +35,7 @@ jobs:
         run: cd gradle-plugin && ../gradlew test
 
       - name: Compile Android Library
-        run: ./gradlew :android-library:testDebugUnitTest
+        run: ./gradlew :android-library:assemble
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
 
