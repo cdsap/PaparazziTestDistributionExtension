@@ -26,12 +26,12 @@ class TDPaparazziPluginTest {
         val project = ProjectBuilder.builder().build()
         project.plugins.apply("io.github.cdsap.td.paparazzi")
         val extension = project.extensions.getByType(TDPaparazziExtension::class.java)
-        extension.libraryVersion.set("0.2")
-        assertTrue(extension.libraryVersion.get() == "0.2")
+        extension.libraryVersion.set("0.2.1")
+        assertTrue(extension.libraryVersion.get() == "0.2.1")
     }
 
     @Test
     fun `default library version matches plugin version`() {
-        assertTrue(TDPaparazziPlugin.DEFAULT_LIBRARY_VERSION == "0.1")
+        assertTrue(TDPaparazziPlugin.DEFAULT_LIBRARY_VERSION == "0.2.0")
     }
 }
