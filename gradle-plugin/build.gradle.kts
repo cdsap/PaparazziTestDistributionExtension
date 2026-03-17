@@ -1,6 +1,7 @@
 plugins {
     id("java-gradle-plugin")
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("com.gradle.plugin-publish") version "1.0.0-rc-1"
 }
 
 group = "io.github.cdsap"
@@ -27,6 +28,14 @@ gradlePlugin {
         create("tdPaparazzi") {
             id = "io.github.cdsap.td.paparazzi"
             implementationClass = "io.github.cdsap.td.paparazzi.plugin.TDPaparazziPlugin"
+            displayName = "Test Distribution Paparazzi Extension"
+            description = "Extension to make compatible Paparazzi html output reports with Develocity Test Distribution"
         }
     }
+}
+
+pluginBundle {
+    website = "https://github.com/cdsap/PaparazziTestDistributionExtension"
+    vcsUrl = "https://github.com/cdsap/PaparazziTestDistributionExtension"
+    tags = listOf("Develocity", "Test Distribution", "Paparazzi")
 }
