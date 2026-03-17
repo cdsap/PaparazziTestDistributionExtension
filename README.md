@@ -1,6 +1,6 @@
 # Test Distribution Extension for Paparazzi
 
-Compatibility library and Gradle plugin to use [Paparazzi](https://github.com/cashapp/paparazzi) with [Gradle Enterprise Test Distribution](https://docs.gradle.com/enterprise/test-distribution/).
+Compatibility library and Gradle plugin to use [Paparazzi](https://github.com/cashapp/paparazzi) with [Develocity Test Distribution](https://docs.gradle.com/develocity/current/administration/admin-manual/#test_distribution).
 
 ## The problem
 
@@ -73,7 +73,7 @@ The plugin can be configured via the `tdPaparazzi` extension:
 tdPaparazzi {
     inputReportDir.set("build/reports/paparazzi")   // default
     outputReportDir.set("build/reports/paparazzi-td") // default
-    libraryVersion.set("0.1")                         // default
+    libraryVersion.set("0.2.0")                         // default
 }
 ```
 
