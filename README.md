@@ -82,7 +82,7 @@ tdPaparazzi {
 Add the library dependency:
 
 ```kotlin
-testImplementation("io.github.cdsap:td-paparazzi-ext:0.1")
+testImplementation("io.github.cdsap:td-paparazzi-ext:0.2.0")
 ```
 
 Use `TDPaparazzi()` in your tests (same as above), then configure Test Distribution
