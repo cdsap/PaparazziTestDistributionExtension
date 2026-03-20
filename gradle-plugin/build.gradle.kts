@@ -12,18 +12,39 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+val functionalTestSourceSet = sourceSets.create("functionalTest") {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+}
+
+configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
+configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
+
 dependencies {
     compileOnly("com.android.tools.build:gradle:9.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    "functionalTestImplementation"(gradleTestKit())
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
+val functionalTest by tasks.registering(Test::class) {
+    testClassesDirs = functionalTestSourceSet.output.classesDirs
+    classpath = functionalTestSourceSet.runtimeClasspath
+    useJUnitPlatform()
+}
+
+tasks.check {
+    dependsOn(functionalTest)
+}
+
 gradlePlugin {
+    testSourceSets(functionalTestSourceSet)
     plugins {
         create("tdPaparazzi") {
             id = "io.github.cdsap.td.paparazzi"
