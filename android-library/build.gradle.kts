@@ -4,9 +4,11 @@ import org.gradle.api.tasks.testing.Test
 
 plugins {
     id("com.android.library")
+
     id("org.jetbrains.kotlin.plugin.compose")
     id("app.cash.paparazzi") version "2.0.0-alpha02"
     id("io.github.cdsap.td.paparazzi")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {

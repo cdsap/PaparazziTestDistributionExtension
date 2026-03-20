@@ -12,7 +12,7 @@ plugins {
 }
 
 develocity {
-    server = "http://ge.solutions-team.gradle.com"
+    server = "https://8-229-57-1.nip.io/"
     allowUntrustedServer = true
     buildScan {
         uploadInBackground = true
