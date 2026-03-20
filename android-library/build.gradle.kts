@@ -57,7 +57,7 @@ dependencies {
         develocity.testDistribution {
             // your TD config
             enabled = true
-            maxLocalExecutors = 1
+            maxLocalExecutors = 0
             maxRemoteExecutors = 3
         }
 
