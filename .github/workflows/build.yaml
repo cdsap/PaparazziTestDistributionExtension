@@ -41,9 +41,9 @@ jobs:
         run: ./gradlew :gradle-plugin:functionalTest
 
       - name: Compile Android Library
-        run: ./gradlew :android-library:assemble
+        run: ./gradlew :android-library:testDebugUnitTest
         env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
 
       - name: Upload reports
         if: always()
