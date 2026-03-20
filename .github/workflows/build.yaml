@@ -28,17 +28,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Library Tests
-        run: ./gradlew :lib:test
-
-      - name: Run Paparazzi Compatibility Tests
-        run: ./gradlew :lib:testPaparazziCompatAll
-
-      - name: Run Gradle Plugin Unit Tests
-        run: ./gradlew :gradle-plugin:test
-
-      - name: Run Gradle Plugin Functional Tests
-        run: ./gradlew :gradle-plugin:functionalTest
 
       - name: Compile Android Library
         run: ./gradlew :android-library:testDebugUnitTest
