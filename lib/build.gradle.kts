@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.2.0"
+version = "0.2.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -15,7 +15,7 @@ java {
 }
 
 dependencies {
-    compileOnly("app.cash.paparazzi:paparazzi:2.0.0-alpha04")
+    compileOnly("app.cash.paparazzi:paparazzi:2.0.0-alpha02")
     implementation("com.squareup.okio:okio:3.1.0")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.jcodec:jcodec-javase:0.2.5")
@@ -23,7 +23,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:1.15.2")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 
-    testImplementation("app.cash.paparazzi:paparazzi:2.0.0-alpha04")
+    testImplementation("app.cash.paparazzi:paparazzi:2.0.0-alpha02")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
