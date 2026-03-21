@@ -1,0 +1,41 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'com.android.application' version '8.13.1'
+        id 'com.android.library' version '8.13.1'
+        id 'org.jetbrains.kotlin.android' version '2.2.0'
+        id 'org.jetbrains.kotlin.jvm' version '2.2.0'
+        id 'org.jetbrains.kotlin.plugin.compose' version '2.2.0'
+        id 'app.cash.paparazzi' version '2.0.0-alpha02'
+        id 'io.github.cdsap.td.paparazzi' version '0.3.0'
+    }
+}
+plugins {
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
+    id("com.gradle.develocity") version "4.3.2"
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+
+
+develocity {
+    server = "https://ge.solutions-team.gradle.com/"
+    allowUntrustedServer = true
+    buildScan {
+        uploadInBackground = true
+        publishing.onlyIf { true }
+    }
+}
+rootProject.name = "integration-test-agp8"
+include ':app'

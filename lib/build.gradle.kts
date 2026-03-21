@@ -7,12 +7,13 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.2.1"
+version = "0.3.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
 
 dependencies {
     compileOnly("app.cash.paparazzi:paparazzi:2.0.0-alpha02")
@@ -65,8 +66,10 @@ tasks.register("testPaparazziCompatAll") {
 
 mavenPublishing {
     publishToMavenCentral()
-    signAllPublications()
-    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.2.0")
+    if (project.findProperty("signing.keyId") != null) {
+        signAllPublications()
+    }
+    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.3.0")
 
     pom {
         scm {

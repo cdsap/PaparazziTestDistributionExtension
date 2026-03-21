@@ -6,15 +6,8 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        java-version: [21]
-
-    runs-on: ${{matrix.os}}
-
+  lib-tests:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.java-version }}
+          java-version: 21
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -40,16 +33,46 @@ jobs:
       - name: Run Gradle Plugin Functional Tests
         run: ./gradlew :gradle-plugin:functionalTest
 
-      - name: Compile Android Library
-        run: ./gradlew :android-library:assemble
-        env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
-
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-${{matrix.os}}-${{matrix.java-version}}
+          name: test-reports-lib
           path: |
             lib/build/reports/tests/
             gradle-plugin/build/reports/tests/
+
+  integration-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "AGP 8.13 + Paparazzi alpha02"
+            project-dir: "integration-test/agp8"
+          - name: "AGP 9.0 + Paparazzi alpha04"
+            project-dir: "integration-test/agp9"
+
+    runs-on: ubuntu-latest
+    name: "integration (${{ matrix.name }})"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish plugin and library to Maven Local
+        run: ./gradlew :lib:publishToMavenLocal :gradle-plugin:publishToMavenLocal
+
+      - name: Run integration test (resolve from Maven Local)
+        working-directory: ${{ matrix.project-dir }}
+        run: ./gradlew :app:recordPaparazziDebug --stacktrace
+        env:
+            DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}

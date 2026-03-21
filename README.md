@@ -31,12 +31,22 @@ build/reports/paparazzi/
     videos/
 ```
 
+## Compatibility
+
+The library is decoupled from the Paparazzi constructor, so it works across Paparazzi versions:
+
+| Paparazzi version | AGP | Gradle | Status |
+|---|---|---|---|
+| 2.0.0-alpha02 | 8.13.1 | 8.13 | Tested |
+| 2.0.0-alpha03 | 8.13.1 | 8.13 | Tested |
+| 2.0.0-alpha04 | 9.0.1 | 9.2.1 | Tested |
+
 ## Usage
 
 ### Option 1: Gradle Plugin (recommended)
 
-Apply the plugin alongside Paparazzi. It automatically registers the merge task and wires
-everything up per variant:
+Apply the plugin alongside Paparazzi. It automatically registers the merge task and adds
+the library dependency:
 
 ```kotlin
 // build.gradle.kts
@@ -47,14 +57,18 @@ plugins {
 }
 ```
 
-In your tests, use `TDPaparazzi()` as a drop-in replacement for `Paparazzi()`:
+In your tests, create a standard `Paparazzi` instance and pass `tdSnapshotHandler()`:
 
 ```kotlin
-import io.github.cdsap.td.paparazzi.TDPaparazzi
+import app.cash.paparazzi.Paparazzi
+import io.github.cdsap.td.paparazzi.tdSnapshotHandler
 
 class MyScreenTest {
     @get:Rule
-    val paparazzi = TDPaparazzi(maxPercentDifference = 0.1)
+    val paparazzi = Paparazzi(
+        maxPercentDifference = 0.1,
+        snapshotHandler = tdSnapshotHandler(maxPercentDifference = 0.1)
+    )
 
     @Test
     fun snapshot() {
@@ -63,17 +77,18 @@ class MyScreenTest {
 }
 ```
 
-`TDPaparazzi()` accepts all the same parameters as `Paparazzi()` (`deviceConfig`, `theme`,
-`renderingMode`, `appCompatEnabled`, `renderExtensions`, `supportsRtl`, `showSystemUi`,
-`useDeviceResolution`).
+`tdSnapshotHandler()` returns a `SnapshotHandler` that automatically selects between
+recording (HTML report) and verification modes based on system properties. Since it
+only provides the handler, it works with any Paparazzi version regardless of constructor
+changes.
 
 The plugin can be configured via the `tdPaparazzi` extension:
 
 ```kotlin
 tdPaparazzi {
-    inputReportDir.set("build/reports/paparazzi")   // default
-    outputReportDir.set("build/reports/paparazzi-td") // default
-    libraryVersion.set("0.2.0")                         // default
+    inputReportDir.set("build/reports/paparazzi")      // default
+    outputReportDir.set("build/reports/paparazzi-td")   // default
+    libraryVersion.set("0.3.0")                         // default
 }
 ```
 
@@ -82,10 +97,10 @@ tdPaparazzi {
 Add the library dependency:
 
 ```kotlin
-testImplementation("io.github.cdsap:td-paparazzi-ext:0.2.0")
+testImplementation("io.github.cdsap:td-paparazzi-ext:0.3.0")
 ```
 
-Use `TDPaparazzi()` in your tests (same as above), then configure Test Distribution
+Use `tdSnapshotHandler()` in your tests (same as above), then configure Test Distribution
 inputs/outputs and define the merge task manually:
 
 ```kotlin
@@ -100,12 +115,6 @@ tasks.withType<Test>().configureEach {
     }
 }
 ```
-
-## Sample
-
-The `android-library` module in this repository contains a complete working example:
-- [build.gradle.kts](https://github.com/cdsap/PaparazziTestDistributionExtension/blob/main/android-library/build.gradle.kts) — plugin applied, no manual merge task
-- [ExampleUnitTest.kt](https://github.com/cdsap/PaparazziTestDistributionExtension/blob/main/android-library/src/test/java/com/example/myapplication/ExampleUnitTest.kt) — test using `TDPaparazzi()`
 
 ## Output
 
@@ -125,9 +134,10 @@ The `android-library` module in this repository contains a complete working exam
 
 | Module | Description |
 |--------|-------------|
-| `lib` | Core library — `TDHtmlReportWriter`, `TDPaparazzi` factory, JSON serialization |
+| `lib` | Core library — `TDHtmlReportWriter`, `tdSnapshotHandler()`, JSON serialization |
 | `gradle-plugin` | Gradle plugin — auto-registers merge tasks, adds library dependency |
-| `android-library` | Sample Android module demonstrating the extension |
+| `integration-test/agp8` | Integration test project for AGP 8.13 + Paparazzi alpha02 |
+| `integration-test/agp9` | Integration test project for AGP 9.0 + Paparazzi alpha04 |
 
 ## Notes
 

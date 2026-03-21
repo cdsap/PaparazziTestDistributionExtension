@@ -5,6 +5,9 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version '2.3.0'
+    }
 }
 plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
@@ -12,7 +15,7 @@ plugins {
 }
 
 develocity {
-    server = "http://ge.solutions-team.gradle.com"
+    server = "https://ge.solutions-team.gradle.com/"
     allowUntrustedServer = true
     buildScan {
         uploadInBackground = true
@@ -27,5 +30,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "td-paparazzi-ext"
-include ':android-library'
 include ':lib'

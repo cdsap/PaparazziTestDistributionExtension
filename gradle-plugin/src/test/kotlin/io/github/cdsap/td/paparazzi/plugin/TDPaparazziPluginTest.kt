@@ -32,6 +32,6 @@ class TDPaparazziPluginTest {
 
     @Test
     fun `default library version matches plugin version`() {
-        assertTrue(TDPaparazziPlugin.DEFAULT_LIBRARY_VERSION == "0.2.0")
+        assertTrue(TDPaparazziPlugin.DEFAULT_LIBRARY_VERSION == "0.3.0")
     }
 }

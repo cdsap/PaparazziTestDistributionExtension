@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.2.1"
+version = "0.3.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -21,7 +21,7 @@ configurations["functionalTestImplementation"].extendsFrom(configurations["testI
 configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
 
 dependencies {
-    compileOnly("com.android.tools.build:gradle:9.0.0")
+    compileOnly("com.android.tools.build:gradle:8.13.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
