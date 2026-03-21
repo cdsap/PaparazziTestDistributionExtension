@@ -1,42 +1,23 @@
 package io.github.cdsap.td.paparazzi
 
-import app.cash.paparazzi.DeviceConfig
-import app.cash.paparazzi.Paparazzi
-import app.cash.paparazzi.RenderExtension
-import com.android.ide.common.rendering.api.SessionParams.RenderingMode
+import app.cash.paparazzi.SnapshotHandler
 
 /**
- * Factory function that creates a [Paparazzi] instance pre-configured with the
- * Test Distribution-compatible snapshot handler.
+ * Returns a Test Distribution-compatible [SnapshotHandler] that can be passed
+ * directly to the Paparazzi constructor.
  *
- * This is a drop-in replacement for [Paparazzi] that automatically selects the
- * appropriate handler (TD report writer or snapshot verifier) based on system properties.
+ * This decouples the library from the Paparazzi constructor signature, allowing
+ * it to work with any Paparazzi version.
  *
  * Usage:
  * ```
  * @get:Rule
- * val paparazzi = TDPaparazzi()
+ * val paparazzi = Paparazzi(
+ *     snapshotHandler = tdSnapshotHandler()
+ * )
  * ```
+ *
+ * @param maxPercentDifference threshold for snapshot verification mode
  */
-fun TDPaparazzi(
-    deviceConfig: DeviceConfig = DeviceConfig(),
-    theme: String = "android:Theme.Material.NoActionBar.Fullscreen",
-    renderingMode: RenderingMode = RenderingMode.SHRINK,
-    appCompatEnabled: Boolean = true,
-    maxPercentDifference: Double = 0.0,
-    renderExtensions: Set<RenderExtension> = setOf(),
-    supportsRtl: Boolean = false,
-    showSystemUi: Boolean = false,
-    useDeviceResolution: Boolean = false
-): Paparazzi = Paparazzi(
-    deviceConfig = deviceConfig,
-    theme = theme,
-    renderingMode = renderingMode,
-    appCompatEnabled = appCompatEnabled,
-    maxPercentDifference = maxPercentDifference,
-    snapshotHandler = TDPaparazziHandlerProvider().determineHandler(maxPercentDifference),
-    renderExtensions = renderExtensions,
-    supportsRtl = supportsRtl,
-    showSystemUi = showSystemUi,
-    useDeviceResolution = useDeviceResolution
-)
+fun tdSnapshotHandler(maxPercentDifference: Double = 0.0): SnapshotHandler =
+    TDPaparazziHandlerProvider().determineHandler(maxPercentDifference)
