@@ -1,6 +1,6 @@
 pluginManagement {
     repositories {
-        mavenLocal()
+      //  mavenLocal()
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -14,7 +14,10 @@ pluginManagement {
         id 'io.github.cdsap.td.paparazzi' version '0.3.0'
     }
 }
-
+plugins {
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
+    id("com.gradle.develocity") version "4.3.2"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -23,6 +26,13 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
+develocity {
+    server = "https://35-247-71-153.nip.io/"
+    allowUntrustedServer = true
+    buildScan {
+        uploadInBackground = true
+        publishing.onlyIf { true }
+    }
+}
 rootProject.name = "integration-test-agp9"
 include ':app'

@@ -75,4 +75,4 @@ jobs:
         working-directory: ${{ matrix.project-dir }}
         run: ./gradlew :app:recordPaparazziDebug --stacktrace
         env:
-            DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
+            DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
