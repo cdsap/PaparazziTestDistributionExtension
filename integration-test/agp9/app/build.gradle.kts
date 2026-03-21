@@ -35,3 +35,36 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+tasks.withType<Test>().configureEach {
+
+    develocity.testDistribution {
+        // your TD config
+        enabled = true
+        maxLocalExecutors = 0
+        maxRemoteExecutors = 3
+    }
+
+    inputs.dir(layout.buildDirectory.dir("intermediates/paparazzi"))
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+
+    configurations.findByName("layoutlibResources")?.let { layoutlibResources ->
+        // Configuration required to include the file collection layoutlibResourcesFiles
+        val layoutlibResourcesFiles = layoutlibResources.incoming.artifactView {
+            attributes {
+                attribute(
+                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                    ArtifactTypeDefinition.DIRECTORY_TYPE
+                )
+            }
+        }.files
+
+        inputs.files(layoutlibResourcesFiles)
+            .withPropertyName("paparazzi.layoutlib.resources")
+            .withPathSensitivity(PathSensitivity.NONE)
+    }
+
+    outputs.dir("build/reports/paparazzi/")
+    useJUnitPlatform()
+}
