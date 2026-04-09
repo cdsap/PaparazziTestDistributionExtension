@@ -5,11 +5,14 @@ import app.cash.paparazzi.SnapshotVerifier
 import java.io.File
 
 class TDPaparazziHandlerProvider {
-    fun determineHandler(maxPercentDifference: Double): SnapshotHandler =
+    fun determineHandler(
+        maxPercentDifference: Double,
+        fileNameProvider: SnapshotFileNameProvider = DefaultSnapshotFileNameProvider
+    ): SnapshotHandler =
         if (System.getProperty("paparazzi.test.verify")?.toBoolean() == true) {
             createSnapshotVerifier(maxPercentDifference)
         } else {
-            TDHtmlReportWriter()
+            TDHtmlReportWriter(fileNameProvider = fileNameProvider)
         }
 
     private fun createSnapshotVerifier(maxPercentDifference: Double): SnapshotVerifier {
