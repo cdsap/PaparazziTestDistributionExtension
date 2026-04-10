@@ -66,50 +66,84 @@ class UtilityFunctionsTest {
     }
 
     @Test
-    fun `toFileName formats single image snapshot correctly`() {
+    fun `DefaultSnapshotFileNameProvider formats single image snapshot correctly`() {
         val snapshot = Snapshot(
             name = "loading",
             testName = TestName("com.example", "MyTest", "testMethod"),
             timestamp = Date(),
             file = null
         )
-        val fileName = snapshot.toFileName("_", "png")
+        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "png")
         assertEquals("com.example_MyTest_testMethod_loading.png", fileName)
     }
 
     @Test
-    fun `toFileName with null name omits label`() {
+    fun `DefaultSnapshotFileNameProvider with null name omits label`() {
         val snapshot = Snapshot(
             name = null,
             testName = TestName("com.example", "MyTest", "testMethod"),
             timestamp = Date(),
             file = null
         )
-        val fileName = snapshot.toFileName("_", "png")
+        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "png")
         assertEquals("com.example_MyTest_testMethod.png", fileName)
     }
 
     @Test
-    fun `toFileName with custom delimiter`() {
+    fun `DefaultSnapshotFileNameProvider with custom delimiter`() {
         val snapshot = Snapshot(
             name = "my snapshot",
             testName = TestName("com.example", "MyTest", "testMethod"),
             timestamp = Date(),
             file = null
         )
-        val fileName = snapshot.toFileName("-", "png")
+        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "-", "png")
         assertEquals("com.example-MyTest-testMethod-my-snapshot.png", fileName)
     }
 
     @Test
-    fun `toFileName with video extension`() {
+    fun `DefaultSnapshotFileNameProvider with video extension`() {
         val snapshot = Snapshot(
             name = "animation",
             testName = TestName("com.example", "MyTest", "testMethod"),
             timestamp = Date(),
             file = null
         )
-        val fileName = snapshot.toFileName("_", "mov")
+        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "mov")
         assertEquals("com.example_MyTest_testMethod_animation.mov", fileName)
+    }
+
+    @Test
+    fun `DefaultSnapshotFileNameProvider replaces spaces in method name`() {
+        val snapshot = Snapshot(
+            name = null,
+            testName = TestName(
+                "com.example.ui",
+                "ButtonSnapshotTest",
+                "render[THEME_A, SIZE_L, DEVICE_X]"
+            ),
+            timestamp = Date(),
+            file = null
+        )
+        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "png")
+        assertEquals(
+            "com.example.ui_ButtonSnapshotTest_render[THEME_A,_SIZE_L,_DEVICE_X].png",
+            fileName
+        )
+    }
+
+    @Test
+    fun `custom SnapshotFileNameProvider is used`() {
+        val customProvider = SnapshotFileNameProvider { snapshot, _, extension ->
+            "${snapshot.testName.className}.${snapshot.testName.methodName}.$extension"
+        }
+        val snapshot = Snapshot(
+            name = "loading",
+            testName = TestName("com.example", "MyTest", "testMethod"),
+            timestamp = Date(),
+            file = null
+        )
+        val fileName = customProvider.toFileName(snapshot, "_", "png")
+        assertEquals("MyTest.testMethod.png", fileName)
     }
 }

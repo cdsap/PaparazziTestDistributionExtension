@@ -18,6 +18,12 @@ import app.cash.paparazzi.SnapshotHandler
  * ```
  *
  * @param maxPercentDifference threshold for snapshot verification mode
+ * @param fileNameProvider strategy for generating snapshot file names.
+ *   Supply a custom implementation to match the naming convention of your
+ *   Paparazzi version and avoid snapshot filename mismatches.
  */
-fun tdSnapshotHandler(maxPercentDifference: Double = 0.0): SnapshotHandler =
-    TDPaparazziHandlerProvider().determineHandler(maxPercentDifference)
+fun tdSnapshotHandler(
+    maxPercentDifference: Double = 0.0,
+    fileNameProvider: SnapshotFileNameProvider = DefaultSnapshotFileNameProvider
+): SnapshotHandler =
+    TDPaparazziHandlerProvider().determineHandler(maxPercentDifference, fileNameProvider)

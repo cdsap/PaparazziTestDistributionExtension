@@ -41,7 +41,8 @@ class TDHtmlReportWriter @JvmOverloads constructor(
             )
         }/reports/paparazzi/td-${System.currentTimeMillis()}"
     ),
-    snapshotRootDirectory: File = File("src/test/snapshots")
+    snapshotRootDirectory: File = File("src/test/snapshots"),
+    private val fileNameProvider: SnapshotFileNameProvider = DefaultSnapshotFileNameProvider
 ) : SnapshotHandler {
     private val runsDirectory: File = File(rootDirectory, "runs")
     private val imagesDirectory: File = File(rootDirectory, "images")
@@ -82,7 +83,7 @@ class TDHtmlReportWriter @JvmOverloads constructor(
                 val shot = if (hashes.size == 1) {
                     val original = File(imagesDirectory, "${hashes[0]}.png")
                     if (isRecording) {
-                        val goldenFile = File(goldenImagesDirectory, snapshot.toFileName("_", "png"))
+                        val goldenFile = File(goldenImagesDirectory, fileNameProvider.toFileName(snapshot, "_", "png"))
                         original.copyTo(goldenFile, overwrite = true)
                     }
                     snapshot.copy(file = original.toJsonPath())
@@ -93,7 +94,7 @@ class TDHtmlReportWriter @JvmOverloads constructor(
                         for ((index, frameHash) in hashes.withIndex()) {
                             val originalFrame = File(imagesDirectory, "$frameHash.png")
                             val frameSnapshot = snapshot.copy(name = "${snapshot.name} $index")
-                            val goldenFile = File(goldenImagesDirectory, frameSnapshot.toFileName("_", "png"))
+                            val goldenFile = File(goldenImagesDirectory, fileNameProvider.toFileName(frameSnapshot, "_", "png"))
                             if (!goldenFile.exists()) {
                                 originalFrame.copyTo(goldenFile)
                             }
@@ -101,7 +102,7 @@ class TDHtmlReportWriter @JvmOverloads constructor(
                     }
                     val original = File(videosDirectory, "$hash.mov")
                     if (isRecording) {
-                        val goldenFile = File(goldenVideosDirectory, snapshot.toFileName("_", "mov"))
+                        val goldenFile = File(goldenVideosDirectory, fileNameProvider.toFileName(snapshot, "_", "mov"))
                         if (!goldenFile.exists()) {
                             original.copyTo(goldenFile)
                         }
@@ -272,15 +273,4 @@ internal val filenameSafeChars = CharMatcher.inRange('a', 'z')
 
 internal fun String.sanitizeForFilename(): String? {
     return filenameSafeChars.negate().replaceFrom(lowercase(Locale.US), '_')
-}
-internal fun Snapshot.toFileName(
-    delimiter: String = "_",
-    extension: String
-): String {
-    val formattedLabel = if (name != null) {
-        "$delimiter${name!!.lowercase(Locale.US).replace("\\s".toRegex(), delimiter)}"
-    } else {
-        ""
-    }
-    return "${testName.packageName}${delimiter}${testName.className}${delimiter}${testName.methodName}$formattedLabel.$extension"
 }
