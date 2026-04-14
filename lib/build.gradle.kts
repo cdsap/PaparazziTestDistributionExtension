@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.3.0"
+version = "0.3.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -69,7 +69,7 @@ mavenPublishing {
     if (project.findProperty("signing.keyId") != null) {
         signAllPublications()
     }
-    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.3.0")
+    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.3.1")
 
     pom {
         scm {
