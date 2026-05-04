@@ -32,6 +32,10 @@ abstract class MergePaparazziOutputsTask : DefaultTask() {
     @get:Input
     abstract val cleanupTdDirectories: Property<Boolean>
 
+    init {
+        cleanupTdDirectories.convention(false)
+    }
+
     @get:Internal
     val runList = mutableListOf<String>()
 
