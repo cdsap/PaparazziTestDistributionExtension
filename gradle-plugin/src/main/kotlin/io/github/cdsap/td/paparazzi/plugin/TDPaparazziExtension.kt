@@ -9,6 +9,9 @@ abstract class TDPaparazziExtension {
     /** Directory where the merged report is written. Defaults to "build/reports/paparazzi-td". */
     abstract val outputReportDir: Property<String>
 
+    /** Whether to delete the temporary td-* directories after merging. Defaults to false. */
+    abstract val cleanupTdDirectories: Property<Boolean>
+
     /**
      * Version of the `io.github.cdsap:td-paparazzi-ext` library to add as testImplementation.
      * Defaults to the plugin version.

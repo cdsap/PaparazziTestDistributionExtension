@@ -2,7 +2,9 @@ package io.github.cdsap.td.paparazzi.plugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -26,6 +28,9 @@ abstract class MergePaparazziOutputsTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
+
+    @get:Input
+    abstract val cleanupTdDirectories: Property<Boolean>
 
     @get:Internal
     val runList = mutableListOf<String>()
@@ -54,6 +59,9 @@ abstract class MergePaparazziOutputsTask : DefaultTask() {
             }
 
         writeIndexJs(outputDir)
+        if (cleanupTdDirectories.get()) {
+            cleanTemporaryDirectories(inputDir)
+        }
     }
 
     private fun extractRunNames(runsDir: File) {
@@ -75,6 +83,12 @@ abstract class MergePaparazziOutputsTask : DefaultTask() {
                 .firstOrNull { it.isFile && it.name == fileName }
                 ?.copyTo(File(outputDir, fileName), overwrite = true)
         }
+    }
+
+    private fun cleanTemporaryDirectories(inputDir: File) {
+        inputDir.listFiles()
+            ?.filter { it.isDirectory && it.name.startsWith("td-") }
+            ?.forEach { it.deleteRecursively() }
     }
 
     private fun cleanOutputDirectories(outputDir: File) {
