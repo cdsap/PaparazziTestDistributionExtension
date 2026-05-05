@@ -48,8 +48,10 @@ jobs:
       matrix:
         include:
           - name: "AGP 8.13 + Paparazzi alpha02"
+            slug: agp8
             project-dir: "integration-test/agp8"
           - name: "AGP 9.0 + Paparazzi alpha04"
+            slug: agp9
             project-dir: "integration-test/agp9"
 
     runs-on: ubuntu-latest
@@ -73,6 +75,46 @@ jobs:
 
       - name: Run integration test (resolve from Maven Local)
         working-directory: ${{ matrix.project-dir }}
-        run: ./gradlew :app:recordPaparazziDebug --stacktrace
         env:
-            DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
+        run: |
+          set -euo pipefail
+
+          echo "::group::Default tdPaparazzi.inputReportDir"
+          ./gradlew :app:recordPaparazziDebug --stacktrace
+          ../../scripts/verify-paparazzi-td-merge.sh \
+            app/build/reports/paparazzi \
+            app/build/reports/paparazzi-td
+          echo "::endgroup::"
+
+          echo "::group::Custom tdPaparazzi.inputReportDir (validates paparazzi.td.report.dir wiring on TD agents)"
+          # cleanupTdDirectories defaults to false, so the first run leaves td-* under
+          # the default path. Wipe them before the override run so we can assert below
+          # that the writer respected the new inputReportDir.
+          rm -rf app/build/reports/paparazzi/td-*
+
+          ./gradlew :app:recordPaparazziDebug \
+            -PtdInputReportDir=build/td-paparazzi-custom-input \
+            -PtdOutputReportDir=build/td-paparazzi-custom-output \
+            --rerun-tasks --stacktrace
+          ../../scripts/verify-paparazzi-td-merge.sh \
+            app/build/td-paparazzi-custom-input \
+            app/build/td-paparazzi-custom-output
+
+          # The override must actually relocate the writer's output. If td-* still
+          # appear under the default path, the system property never reached the agents.
+          if compgen -G "app/build/reports/paparazzi/td-*" > /dev/null; then
+            echo "::error::Custom inputReportDir was set, but td-* dirs still appeared under app/build/reports/paparazzi — paparazzi.td.report.dir wiring is broken."
+            exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: Upload merged TD Paparazzi report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paparazzi-td-${{ matrix.slug }}
+          path: |
+            ${{ matrix.project-dir }}/app/build/reports/paparazzi-td/
+            ${{ matrix.project-dir }}/app/build/td-paparazzi-custom-output/
+          if-no-files-found: ignore

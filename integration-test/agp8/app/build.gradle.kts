@@ -35,6 +35,19 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// Allow CI to relocate the TD report dirs without touching this file. The default
+// keeps the plugin's built-in convention (build/reports/paparazzi -> build/reports/paparazzi-td);
+// passing -PtdInputReportDir=... -PtdOutputReportDir=... exercises the
+// `paparazzi.td.report.dir` wiring end-to-end on Test Distribution agents.
+val tdInputReportDirOverride = providers.gradleProperty("tdInputReportDir")
+val tdOutputReportDirOverride = providers.gradleProperty("tdOutputReportDir")
+val tdInputReportDirPath = tdInputReportDirOverride.getOrElse("build/reports/paparazzi")
+
+tdPaparazzi {
+    tdInputReportDirOverride.orNull?.let { inputReportDir.set(it) }
+    tdOutputReportDirOverride.orNull?.let { outputReportDir.set(it) }
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 
@@ -71,5 +84,5 @@ tasks.withType<Test>().configureEach {
             .withPathSensitivity(PathSensitivity.NONE)
     }
 
-    outputs.dir(layout.buildDirectory.dir("reports/paparazzi"))
+    outputs.dir(layout.projectDirectory.dir(tdInputReportDirPath))
 }
