@@ -89,6 +89,7 @@ tdPaparazzi {
     inputReportDir.set("build/reports/paparazzi")      // default
     outputReportDir.set("build/reports/paparazzi-td")   // default
     libraryVersion.set("0.3.1")                         // default
+    cleanupTdDirectories.set(false)                     // default
 }
 ```
 

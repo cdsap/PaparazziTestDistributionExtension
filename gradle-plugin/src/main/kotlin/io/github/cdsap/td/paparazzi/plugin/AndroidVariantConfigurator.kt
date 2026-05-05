@@ -32,6 +32,7 @@ internal object AndroidVariantConfigurator {
                         extension.outputReportDir.getOrElse("build/reports/paparazzi-td")
                     )
                 )
+                task.cleanupTdDirectories.set(extension.cleanupTdDirectories.orElse(false))
             }
 
             project.tasks.withType(Test::class.java).configureEach { testTask ->

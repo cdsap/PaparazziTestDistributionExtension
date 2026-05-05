@@ -149,6 +149,47 @@ class MergePaparazziOutputsTaskTest {
         assertTrue(indexJs.trimEnd().endsWith("];"))
     }
 
+    @Test
+    fun `merge cleans up temporary td directories when cleanup enabled`() {
+        val inputDir = File(tempDir, "input")
+        val outputDir = File(tempDir, "output")
+
+        createTdReport(inputDir, "td-1000", "run_abc123", listOf("img1.png"), "shot1 content")
+        createTdReport(inputDir, "td-2000", "run_def456", listOf("img2.png"), "shot2 content")
+
+        val task = createTask()
+        task.cleanupTdDirectories.set(true)
+        task.inputDirectory.set(task.project.layout.projectDirectory.dir(inputDir.absolutePath))
+        task.outputDirectory.set(task.project.layout.projectDirectory.dir(outputDir.absolutePath))
+
+        task.merge()
+
+        val remainingTdDirs = inputDir.listFiles()
+            ?.filter { it.isDirectory && it.name.startsWith("td-") }
+            ?: emptyList()
+        assertTrue(remainingTdDirs.isEmpty(), "Expected td-* directories to be cleaned up after merge")
+    }
+
+    @Test
+    fun `merge preserves td directories when cleanup disabled`() {
+        val inputDir = File(tempDir, "input")
+        val outputDir = File(tempDir, "output")
+
+        createTdReport(inputDir, "td-1000", "run_abc123", listOf("img1.png"), "shot1 content")
+        createTdReport(inputDir, "td-2000", "run_def456", listOf("img2.png"), "shot2 content")
+
+        val task = createTask()
+        task.inputDirectory.set(task.project.layout.projectDirectory.dir(inputDir.absolutePath))
+        task.outputDirectory.set(task.project.layout.projectDirectory.dir(outputDir.absolutePath))
+
+        task.merge()
+
+        val remainingTdDirs = inputDir.listFiles()
+            ?.filter { it.isDirectory && it.name.startsWith("td-") }
+            ?: emptyList()
+        assertEquals(2, remainingTdDirs.size, "Expected td-* directories to be preserved when cleanup is disabled")
+    }
+
     private fun createTdReport(
         inputDir: File,
         tdName: String,
