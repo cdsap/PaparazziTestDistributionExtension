@@ -1,5 +1,3 @@
-import org.gradle.api.artifacts.type.ArtifactTypeDefinition
-import org.gradle.api.tasks.PathSensitivity
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -37,39 +35,10 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-
-    inputs.file(
-        layout.buildDirectory.file(
-            "intermediates/paparazzi/${
-                name.replace("UnitTest", "")
-                    .replace("test", "")
-                    .lowercase()
-            }/resources.json"
-        )
-    )
-
-    develocity.testDistribution {
-        enabled = true
-        remoteExecutionPreferred = true
-        maxLocalExecutors = 0
+    testLogging {
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
-
-    inputs.dir(layout.buildDirectory.dir("intermediates/paparazzi"))
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    configurations.findByName("layoutlibResources")?.let { layoutlibResources ->
-        // Configuration required to include the file collection layoutlibResourcesFiles
-        val layoutlibResourcesFiles = layoutlibResources.incoming.artifactView {
-            attributes.attribute(
-                ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
-                ArtifactTypeDefinition.DIRECTORY_TYPE
-            )
-        }.files
-
-        inputs.files(layoutlibResourcesFiles)
-            .withPropertyName("paparazzi.layoutlib.resources")
-            .withPathSensitivity(PathSensitivity.NONE)
-    }
-
-    outputs.dir(layout.buildDirectory.dir("reports/paparazzi"))
 }
