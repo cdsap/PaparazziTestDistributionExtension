@@ -3,7 +3,15 @@ package io.github.cdsap.td.paparazzi.plugin
 import org.gradle.api.provider.Property
 
 abstract class TDPaparazziExtension {
-    /** Directory containing the individual td-* report folders. Defaults to "build/reports/paparazzi". */
+    /**
+     * Directory containing the individual `td-*` report folders. Defaults to
+     * `build/reports/paparazzi`.
+     *
+     * The plugin sets this as the `paparazzi.td.report.dir` system property on the
+     * variant's unit-test task, so `TDHtmlReportWriter` writes the per-execution
+     * `td-<timestamp>` folders here. The merge task also reads from this directory,
+     * keeping the writer and the merger in sync.
+     */
     abstract val inputReportDir: Property<String>
 
     /** Directory where the merged report is written. Defaults to "build/reports/paparazzi-td". */
