@@ -31,7 +31,15 @@ dependencies {
     testImplementation("org.junit.vintage:junit-vintage-engine:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    inputs.file("build/intermediates/paparazzi/${
+        name.replace("UnitTest", "").replace("test", "").lowercase()
+    }/resources.json")
+    develocity.testDistribution {
+        enabled = true
+        remoteExecutionPreferred = true
+        maxLocalExecutors = 0
+        
+    }
 }

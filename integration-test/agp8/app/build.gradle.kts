@@ -35,10 +35,13 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-    testLogging {
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    inputs.file("build/intermediates/paparazzi/${
+        name.replace("UnitTest", "").replace("test", "").lowercase()
+    }/resources.json")
+    develocity.testDistribution {
+        enabled = true
+        remoteExecutionPreferred = true
+        maxLocalExecutors = 0
+        
     }
 }
