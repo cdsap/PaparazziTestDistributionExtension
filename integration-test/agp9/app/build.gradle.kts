@@ -51,6 +51,9 @@ tdPaparazzi {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 
+    maxParallelForks = 3
+    setForkEvery(1L)
+
     inputs.file(
         layout.buildDirectory.file(
             "intermediates/paparazzi/${
