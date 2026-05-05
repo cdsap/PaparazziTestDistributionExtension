@@ -18,9 +18,8 @@ internal object AndroidVariantConfigurator {
 
             val testTaskName = "test${variantName}UnitTest"
 
-            val inputReportDir = project.layout.projectDirectory.dir(
-                extension.inputReportDir.getOrElse(DEFAULT_INPUT_REPORT_DIR)
-            )
+            val inputReportDirPath = extension.inputReportDir.getOrElse(DEFAULT_INPUT_REPORT_DIR)
+            val inputReportDir = project.layout.projectDirectory.dir(inputReportDirPath)
 
             val mergeTask = project.tasks.register(
                 "mergePaparazzi${variantName}Outputs",
@@ -38,7 +37,7 @@ internal object AndroidVariantConfigurator {
 
             project.tasks.withType(Test::class.java).configureEach { testTask ->
                 if (testTask.name == testTaskName) {
-                    wireTestTask(testTask, mergeTask, inputReportDir.asFile.absolutePath)
+                    wireTestTask(testTask, mergeTask, inputReportDirPath)
                 }
             }
         }
@@ -47,13 +46,18 @@ internal object AndroidVariantConfigurator {
     /**
      * Wires a unit-test task to the TD report layout: sets the system property the writer
      * reads, and makes the merge task run after the test task finishes.
+     *
+     * [inputReportDirPath] should be a project-relative path (the same string the user
+     * configures on the extension). Test Distribution does not path-remap system property
+     * values, so a daemon-side absolute path would not resolve on remote agents — the
+     * relative form lets each agent resolve it against its own workspace.
      */
     internal fun wireTestTask(
         testTask: Test,
         mergeTask: TaskProvider<MergePaparazziOutputsTask>,
-        inputReportDirAbsolutePath: String,
+        inputReportDirPath: String,
     ) {
-        testTask.systemProperty(TD_REPORT_DIR_SYSTEM_PROPERTY, inputReportDirAbsolutePath)
+        testTask.systemProperty(TD_REPORT_DIR_SYSTEM_PROPERTY, inputReportDirPath)
         testTask.finalizedBy(mergeTask)
     }
 

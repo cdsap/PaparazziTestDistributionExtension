@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test as JTest
 class AndroidVariantConfiguratorTest {
 
     @JTest
-    fun `wireTestTask sets td report dir system property`() {
+    fun `wireTestTask sets td report dir system property to the relative path`() {
         val project = ProjectBuilder.builder().build()
         val testTask = project.tasks.create("testDebugUnitTest", Test::class.java)
         val mergeTask = project.tasks.register(
@@ -17,10 +17,12 @@ class AndroidVariantConfiguratorTest {
             MergePaparazziOutputsTask::class.java
         )
 
-        AndroidVariantConfigurator.wireTestTask(testTask, mergeTask, "/abs/path/to/input")
+        AndroidVariantConfigurator.wireTestTask(testTask, mergeTask, "build/reports/paparazzi")
 
+        // Must be the relative path, not absolutized. Test Distribution does not remap
+        // system-property values, so daemon-side absolute paths would not resolve on agents.
         assertEquals(
-            "/abs/path/to/input",
+            "build/reports/paparazzi",
             testTask.systemProperties[AndroidVariantConfigurator.TD_REPORT_DIR_SYSTEM_PROPERTY]
         )
     }
@@ -34,7 +36,7 @@ class AndroidVariantConfiguratorTest {
             MergePaparazziOutputsTask::class.java
         )
 
-        AndroidVariantConfigurator.wireTestTask(testTask, mergeTask, "/abs/path/to/input")
+        AndroidVariantConfigurator.wireTestTask(testTask, mergeTask, "build/reports/paparazzi")
 
         val finalizers = testTask.finalizedBy.getDependencies(testTask).map { it.name }
         assertTrue(
