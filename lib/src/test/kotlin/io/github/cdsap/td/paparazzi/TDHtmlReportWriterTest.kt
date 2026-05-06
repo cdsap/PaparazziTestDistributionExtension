@@ -20,6 +20,27 @@ class TDHtmlReportWriterTest {
     @AfterEach
     fun cleanup() {
         System.clearProperty("paparazzi.test.record")
+        System.clearProperty("paparazzi.td.report.dir")
+        System.clearProperty("paparazzi.build.dir")
+    }
+
+    @Test
+    fun `default rootDirectory honors paparazzi td report dir system property`() {
+        val configuredParent = File(tempDir, "custom-input").also { it.mkdirs() }
+        System.setProperty("paparazzi.td.report.dir", configuredParent.absolutePath)
+
+        TDHtmlReportWriter(
+            runName = "testrun",
+            snapshotRootDirectory = File(tempDir, "snapshots")
+        )
+
+        val tdDirs = configuredParent.listFiles()
+            ?.filter { it.isDirectory && it.name.startsWith("td-") }
+            ?: emptyList()
+        assertEquals(1, tdDirs.size, "Expected a single td-* directory under the configured parent")
+        assertTrue(File(tdDirs.single(), "runs").exists())
+        assertTrue(File(tdDirs.single(), "images").exists())
+        assertTrue(File(tdDirs.single(), "videos").exists())
     }
 
     @Test

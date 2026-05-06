@@ -34,12 +34,8 @@ import javax.imageio.ImageIO
 class TDHtmlReportWriter @JvmOverloads constructor(
     private val runName: String = defaultRunName(),
     private val rootDirectory: File = File(
-        "${
-            System.getProperty(
-                "paparazzi.build.dir",
-                "build"
-            )
-        }/reports/paparazzi/td-${System.currentTimeMillis()}"
+        defaultReportParentDir(),
+        "td-${System.currentTimeMillis()}"
     ),
     snapshotRootDirectory: File = File("src/test/snapshots"),
     private val fileNameProvider: SnapshotFileNameProvider = DefaultSnapshotFileNameProvider
@@ -265,6 +261,21 @@ internal fun defaultRunName(): String {
     val timestamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(now)
     val token = UUID.randomUUID().toString().substring(0, 6)
     return "${timestamp}_$token"
+}
+
+/**
+ * Resolves the parent directory under which `td-<timestamp>` report folders are written.
+ *
+ * Resolution order:
+ *  1. `paparazzi.td.report.dir` — the Gradle plugin sets this from `tdPaparazzi.inputReportDir`,
+ *     so the merge task and the writer always agree on the location.
+ *  2. `${paparazzi.build.dir or "build"}/reports/paparazzi` — backwards-compatible default for
+ *     setups that don't apply the plugin.
+ */
+internal fun defaultReportParentDir(): String {
+    System.getProperty("paparazzi.td.report.dir")?.takeIf { it.isNotBlank() }?.let { return it }
+    val buildDir = System.getProperty("paparazzi.build.dir", "build")
+    return "$buildDir/reports/paparazzi"
 }
 
 internal val filenameSafeChars = CharMatcher.inRange('a', 'z')

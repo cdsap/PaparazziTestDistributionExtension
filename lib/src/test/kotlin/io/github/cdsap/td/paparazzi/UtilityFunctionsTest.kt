@@ -2,6 +2,7 @@ package io.github.cdsap.td.paparazzi
 
 import app.cash.paparazzi.Snapshot
 import app.cash.paparazzi.TestName
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -9,6 +10,42 @@ import org.junit.jupiter.api.Test
 import java.util.Date
 
 class UtilityFunctionsTest {
+
+    @AfterEach
+    fun clearReportDirProperties() {
+        System.clearProperty("paparazzi.td.report.dir")
+        System.clearProperty("paparazzi.build.dir")
+    }
+
+    @Test
+    fun `defaultReportParentDir uses paparazzi td report dir when set`() {
+        System.setProperty("paparazzi.td.report.dir", "/tmp/my-td-reports")
+        assertEquals("/tmp/my-td-reports", defaultReportParentDir())
+    }
+
+    @Test
+    fun `defaultReportParentDir prefers paparazzi td report dir over paparazzi build dir`() {
+        System.setProperty("paparazzi.td.report.dir", "/tmp/my-td-reports")
+        System.setProperty("paparazzi.build.dir", "/tmp/some-build")
+        assertEquals("/tmp/my-td-reports", defaultReportParentDir())
+    }
+
+    @Test
+    fun `defaultReportParentDir falls back to paparazzi build dir`() {
+        System.setProperty("paparazzi.build.dir", "custom-build")
+        assertEquals("custom-build/reports/paparazzi", defaultReportParentDir())
+    }
+
+    @Test
+    fun `defaultReportParentDir defaults to build reports paparazzi`() {
+        assertEquals("build/reports/paparazzi", defaultReportParentDir())
+    }
+
+    @Test
+    fun `defaultReportParentDir treats blank paparazzi td report dir as unset`() {
+        System.setProperty("paparazzi.td.report.dir", "   ")
+        assertEquals("build/reports/paparazzi", defaultReportParentDir())
+    }
 
     @Test
     fun `defaultRunName has expected format`() {
