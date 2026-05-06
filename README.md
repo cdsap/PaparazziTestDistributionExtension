@@ -96,8 +96,10 @@ tdPaparazzi {
 `inputReportDir` is the source of truth for where the per-execution `td-<timestamp>`
 folders live. The plugin sets it as the `paparazzi.td.report.dir` system property on
 each variant's unit-test task, so the writer in `TDHtmlReportWriter` and the merge task
-both target the same directory. Override `inputReportDir` to relocate those folders
-(e.g. out of the way of another plugin that scans `build/reports/paparazzi`).
+both target the same directory. Override `inputReportDir` to relocate the per-execution
+`td-<timestamp>` folders (e.g. out of the way of another plugin that scans
+`build/reports/paparazzi`). The merged report location is controlled separately by
+`outputReportDir`.
 
 ### Option 2: Manual setup
 
