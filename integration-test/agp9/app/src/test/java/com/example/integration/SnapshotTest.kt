@@ -9,6 +9,7 @@ import org.junit.Test
 class SnapshotTest {
     @get:Rule
     val paparazzi = Paparazzi(
+        // Comment this out to see the expected snapshot.gif output
         snapshotHandler = tdSnapshotHandler()
     )
 
