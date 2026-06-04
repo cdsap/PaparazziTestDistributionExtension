@@ -51,8 +51,8 @@ tasks.withType<Test>().configureEach {
 
   configurations.findByName("layoutlibResources")?.let { layoutlibResources ->
     // Configuration required to include the file collection layoutlibResourcesFiles
-    val layoutlibResourcesFiles = layoutlibResources.incoming.artifactView { view ->
-      view.attributes.attribute(
+    val layoutlibResourcesFiles = layoutlibResources.incoming.artifactView {
+      attributes.attribute(
         ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
         ArtifactTypeDefinition.DIRECTORY_TYPE
       )
