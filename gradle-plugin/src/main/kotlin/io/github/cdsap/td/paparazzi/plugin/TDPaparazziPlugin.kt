@@ -31,6 +31,6 @@ class TDPaparazziPlugin : Plugin<Project> {
     }
 
     companion object {
-        const val DEFAULT_LIBRARY_VERSION = "0.4.0"
+        const val DEFAULT_LIBRARY_VERSION = "0.5.0-SNAPSHOT"
     }
 }

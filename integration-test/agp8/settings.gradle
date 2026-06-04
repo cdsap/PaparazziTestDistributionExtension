@@ -30,7 +30,7 @@ dependencyResolutionManagement {
 
 
 develocity {
-    server = "https://ge.solutions-team.gradle.com/"
+    server = "https://34-53-93-11.nip.io/"
     allowUntrustedServer = true
     buildScan {
         uploadInBackground = true

@@ -1,15 +1,19 @@
+@file:Suppress("DEPRECATION")
+
 package io.github.cdsap.td.paparazzi
 
 import app.cash.paparazzi.Snapshot
 import java.util.Locale
 
 /**
- * Default file name provider that matches the naming convention used by this library.
- *
- * Format: `{packageName}{delimiter}{className}{delimiter}{methodName}[{delimiter}{label}].{extension}`
- *
- * The snapshot [Snapshot.name] (if present) is lowercased and whitespace is replaced with the delimiter.
+ * Default file name provider, retained for source compatibility. Paparazzi's
+ * own `Snapshot.toFileName` is what actually produces golden filenames now;
+ * this implementation is no longer used internally.
  */
+@Deprecated(
+    "Filename generation is handled by Paparazzi; this implementation is no longer used.",
+    level = DeprecationLevel.WARNING
+)
 object DefaultSnapshotFileNameProvider : SnapshotFileNameProvider {
     override fun toFileName(snapshot: Snapshot, delimiter: String, extension: String): String {
         val formattedLabel = if (snapshot.name != null) {

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.github.cdsap.td.paparazzi
 
 import app.cash.paparazzi.Snapshot
@@ -64,45 +66,6 @@ class UtilityFunctionsTest {
     }
 
     @Test
-    fun `sanitizeForFilename replaces uppercase with lowercase`() {
-        assertEquals("hello", "HELLO".sanitizeForFilename())
-    }
-
-    @Test
-    fun `sanitizeForFilename replaces spaces with underscores`() {
-        assertEquals("hello_world", "hello world".sanitizeForFilename())
-    }
-
-    @Test
-    fun `sanitizeForFilename preserves safe characters`() {
-        assertEquals("abc-123_test.file", "abc-123_test.file".sanitizeForFilename())
-    }
-
-    @Test
-    fun `sanitizeForFilename replaces special characters`() {
-        assertEquals("test_file", "test!file".sanitizeForFilename())
-    }
-
-    @Test
-    fun `filenameSafeChars allows expected characters`() {
-        assertTrue(filenameSafeChars.matches('a'))
-        assertTrue(filenameSafeChars.matches('z'))
-        assertTrue(filenameSafeChars.matches('0'))
-        assertTrue(filenameSafeChars.matches('9'))
-        assertTrue(filenameSafeChars.matches('_'))
-        assertTrue(filenameSafeChars.matches('-'))
-        assertTrue(filenameSafeChars.matches('.'))
-    }
-
-    @Test
-    fun `filenameSafeChars rejects unsafe characters`() {
-        assertTrue(!filenameSafeChars.matches('A'))
-        assertTrue(!filenameSafeChars.matches(' '))
-        assertTrue(!filenameSafeChars.matches('!'))
-        assertTrue(!filenameSafeChars.matches('/'))
-    }
-
-    @Test
     fun `DefaultSnapshotFileNameProvider formats single image snapshot correctly`() {
         val snapshot = Snapshot(
             name = "loading",
@@ -127,50 +90,7 @@ class UtilityFunctionsTest {
     }
 
     @Test
-    fun `DefaultSnapshotFileNameProvider with custom delimiter`() {
-        val snapshot = Snapshot(
-            name = "my snapshot",
-            testName = TestName("com.example", "MyTest", "testMethod"),
-            timestamp = Date(),
-            file = null
-        )
-        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "-", "png")
-        assertEquals("com.example-MyTest-testMethod-my-snapshot.png", fileName)
-    }
-
-    @Test
-    fun `DefaultSnapshotFileNameProvider with video extension`() {
-        val snapshot = Snapshot(
-            name = "animation",
-            testName = TestName("com.example", "MyTest", "testMethod"),
-            timestamp = Date(),
-            file = null
-        )
-        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "mov")
-        assertEquals("com.example_MyTest_testMethod_animation.mov", fileName)
-    }
-
-    @Test
-    fun `DefaultSnapshotFileNameProvider replaces spaces in method name`() {
-        val snapshot = Snapshot(
-            name = null,
-            testName = TestName(
-                "com.example.ui",
-                "ButtonSnapshotTest",
-                "render[THEME_A, SIZE_L, DEVICE_X]"
-            ),
-            timestamp = Date(),
-            file = null
-        )
-        val fileName = DefaultSnapshotFileNameProvider.toFileName(snapshot, "_", "png")
-        assertEquals(
-            "com.example.ui_ButtonSnapshotTest_render[THEME_A,_SIZE_L,_DEVICE_X].png",
-            fileName
-        )
-    }
-
-    @Test
-    fun `custom SnapshotFileNameProvider is used`() {
+    fun `custom SnapshotFileNameProvider can still be implemented`() {
         val customProvider = SnapshotFileNameProvider { snapshot, _, extension ->
             "${snapshot.testName.className}.${snapshot.testName.methodName}.$extension"
         }

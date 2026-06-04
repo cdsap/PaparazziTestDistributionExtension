@@ -34,4 +34,10 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    develocity {
+        testDistribution {
+            enabled.set(true)
+            maxLocalExecutors.set(0)
+        }
+    }
 }

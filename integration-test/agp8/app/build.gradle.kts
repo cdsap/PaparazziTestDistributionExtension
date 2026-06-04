@@ -41,4 +41,10 @@ tasks.withType<Test>().configureEach {
         showStackTraces = true
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
+    develocity {
+        testDistribution {
+            enabled.set(true)
+            maxLocalExecutors.set(0)
+        }
+    }
 }

@@ -47,10 +47,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "AGP 8.13 + Paparazzi alpha02"
+          - name: "AGP 8.13 + Paparazzi alpha02 (published 0.4.0)"
             project-dir: "integration-test/agp8"
-          - name: "AGP 9.0 + Paparazzi alpha04"
+            slug: "agp8-published"
+            use-local-publish: false
+          - name: "AGP 9.0 + Paparazzi alpha04 (local 0.5.0-SNAPSHOT)"
             project-dir: "integration-test/agp9"
+            slug: "agp9-local"
+            use-local-publish: true
 
     runs-on: ubuntu-latest
     name: "integration (${{ matrix.name }})"
@@ -69,10 +73,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish plugin and library to Maven Local
+        if: matrix.use-local-publish
         run: ./gradlew :lib:publishToMavenLocal :gradle-plugin:publishToMavenLocal
 
-      - name: Run integration test (resolve from Maven Local)
+      - name: Run integration test
         working-directory: ${{ matrix.project-dir }}
         run: ./gradlew :app:recordPaparazziDebug --stacktrace
         env:
-            DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
+
+      - name: Upload app project output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-output-${{ matrix.slug }}
+          path: |
+            ${{ matrix.project-dir }}/app/build/
+            ${{ matrix.project-dir }}/app/src/test/snapshots/

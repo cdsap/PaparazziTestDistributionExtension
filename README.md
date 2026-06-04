@@ -143,7 +143,7 @@ tasks.withType<Test>().configureEach {
 
 | Module | Description |
 |--------|-------------|
-| `lib` | Core library — `TDHtmlReportWriter`, `tdSnapshotHandler()`, JSON serialization |
+| `lib` | Core library — `tdSnapshotHandler()` and a thin `TDHtmlReportWriter` that wraps Paparazzi's `HtmlReportWriter` with a per-agent report directory |
 | `gradle-plugin` | Gradle plugin — auto-registers merge tasks, adds library dependency |
 | `integration-test/agp8` | Integration test project for AGP 8.13 + Paparazzi alpha02 |
 | `integration-test/agp9` | Integration test project for AGP 9.0 + Paparazzi alpha04 |

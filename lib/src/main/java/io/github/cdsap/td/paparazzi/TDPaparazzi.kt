@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.github.cdsap.td.paparazzi
 
 import app.cash.paparazzi.SnapshotHandler
@@ -18,12 +20,13 @@ import app.cash.paparazzi.SnapshotHandler
  * ```
  *
  * @param maxPercentDifference threshold for snapshot verification mode
- * @param fileNameProvider strategy for generating snapshot file names.
- *   Supply a custom implementation to match the naming convention of your
- *   Paparazzi version and avoid snapshot filename mismatches.
+ * @param fileNameProvider ignored; retained for source compatibility. Golden
+ *   filenames are now produced by Paparazzi itself.
  */
+@JvmOverloads
 fun tdSnapshotHandler(
     maxPercentDifference: Double = 0.0,
+    @Suppress("UNUSED_PARAMETER")
     fileNameProvider: SnapshotFileNameProvider = DefaultSnapshotFileNameProvider
 ): SnapshotHandler =
-    TDPaparazziHandlerProvider().determineHandler(maxPercentDifference, fileNameProvider)
+    TDPaparazziHandlerProvider().determineHandler(maxPercentDifference)

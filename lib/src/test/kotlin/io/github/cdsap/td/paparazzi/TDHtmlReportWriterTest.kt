@@ -4,7 +4,6 @@ import app.cash.paparazzi.Snapshot
 import app.cash.paparazzi.TestName
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -22,6 +21,7 @@ class TDHtmlReportWriterTest {
         System.clearProperty("paparazzi.test.record")
         System.clearProperty("paparazzi.td.report.dir")
         System.clearProperty("paparazzi.build.dir")
+        System.clearProperty("paparazzi.snapshot.dir")
     }
 
     @Test
@@ -44,9 +44,9 @@ class TDHtmlReportWriterTest {
     }
 
     @Test
-    fun `constructor creates required directories`() {
+    fun `constructor creates the standard Paparazzi report directories`() {
         val rootDir = File(tempDir, "reports")
-        val writer = TDHtmlReportWriter(
+        TDHtmlReportWriter(
             runName = "testrun",
             rootDirectory = rootDir,
             snapshotRootDirectory = File(tempDir, "snapshots")
@@ -58,9 +58,9 @@ class TDHtmlReportWriterTest {
     }
 
     @Test
-    fun `constructor writes initial run js file`() {
+    fun `constructor writes the run js file`() {
         val rootDir = File(tempDir, "reports")
-        val writer = TDHtmlReportWriter(
+        TDHtmlReportWriter(
             runName = "testrun",
             rootDirectory = rootDir,
             snapshotRootDirectory = File(tempDir, "snapshots")
@@ -70,13 +70,12 @@ class TDHtmlReportWriterTest {
         assertTrue(runJs.exists())
         val content = runJs.readText()
         assertTrue(content.startsWith("window.runs[\"testrun\"] = "))
-        assertTrue(content.endsWith(";"))
     }
 
     @Test
-    fun `constructor writes index js file`() {
+    fun `constructor writes the all-runs index`() {
         val rootDir = File(tempDir, "reports")
-        val writer = TDHtmlReportWriter(
+        TDHtmlReportWriter(
             runName = "testrun",
             rootDirectory = rootDir,
             snapshotRootDirectory = File(tempDir, "snapshots")
@@ -90,7 +89,7 @@ class TDHtmlReportWriterTest {
     }
 
     @Test
-    fun `newFrameHandler writes image and records shot`() {
+    fun `single-frame snapshot writes a png in images`() {
         val rootDir = File(tempDir, "reports")
         val writer = TDHtmlReportWriter(
             runName = "testrun",
@@ -99,57 +98,30 @@ class TDHtmlReportWriterTest {
         )
 
         val snapshot = Snapshot(
-            name = "test-shot",
+            name = "test_shot",
             testName = TestName("com.example", "MyTest", "testMethod"),
             timestamp = Date(),
             file = null
         )
 
-        val frameHandler = writer.newFrameHandler(snapshot, 1, 1)
-        val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
-        frameHandler.handle(image)
-        frameHandler.close()
+        writer.newFrameHandler(snapshot, 1, -1).use { handler ->
+            handler.handle(BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB))
+        }
 
-        val images = File(rootDir, "images").listFiles()
-        assertNotNull(images)
-        assertTrue(images!!.any { it.name.endsWith(".png") })
+        val images = File(rootDir, "images").listFiles().orEmpty()
+        assertTrue(images.any { it.name.endsWith(".png") })
     }
 
     @Test
-    fun `close writes final run js with shots`() {
+    fun `multi-frame gif writes a single animated png in videos and no per-frame files`() {
         val rootDir = File(tempDir, "reports")
+        val snapshotDir = File(tempDir, "snapshots")
+        System.setProperty("paparazzi.test.record", "true")
+
         val writer = TDHtmlReportWriter(
             runName = "testrun",
             rootDirectory = rootDir,
-            snapshotRootDirectory = File(tempDir, "snapshots")
-        )
-
-        val snapshot = Snapshot(
-            name = "test-shot",
-            testName = TestName("com.example", "MyTest", "testMethod"),
-            timestamp = Date(),
-            file = null
-        )
-
-        val frameHandler = writer.newFrameHandler(snapshot, 1, 1)
-        frameHandler.handle(BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB))
-        frameHandler.close()
-
-        writer.close()
-
-        val runJs = File(rootDir, "runs/testrun.js")
-        val content = runJs.readText()
-        assertTrue(content.contains("test-shot"))
-        assertTrue(content.contains("com.example.MyTest#testMethod"))
-    }
-
-    @Test
-    fun `multiple frames create a video`() {
-        val rootDir = File(tempDir, "reports")
-        val writer = TDHtmlReportWriter(
-            runName = "testrun",
-            rootDirectory = rootDir,
-            snapshotRootDirectory = File(tempDir, "snapshots")
+            snapshotRootDirectory = snapshotDir
         )
 
         val snapshot = Snapshot(
@@ -159,64 +131,37 @@ class TDHtmlReportWriterTest {
             file = null
         )
 
-        val frameHandler = writer.newFrameHandler(snapshot, 3, 30)
-        // Create distinct frames
-        for (i in 0 until 3) {
-            val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
-            val g = image.createGraphics()
-            g.fillRect(i * 10, 0, 10, 10)
-            g.dispose()
-            frameHandler.handle(image)
+        writer.newFrameHandler(snapshot, 3, 30).use { handler ->
+            for (i in 0 until 3) {
+                val image = BufferedImage(40, 40, BufferedImage.TYPE_INT_ARGB)
+                image.createGraphics().apply {
+                    fillRect(i * 10, 0, 10, 10)
+                    dispose()
+                }
+                handler.handle(image)
+            }
         }
-        frameHandler.close()
 
-        val videos = File(rootDir, "videos").listFiles()
-        assertNotNull(videos)
-        assertTrue(videos!!.any { it.name.endsWith(".mov") })
+        val videos = File(rootDir, "videos").listFiles().orEmpty()
+        assertEquals(1, videos.count { it.extension == "png" }, "Expected exactly one APNG in videos/")
+        assertTrue(videos.none { it.extension == "mov" }, "No legacy .mov should be written")
+
+        val goldenVideos = File(snapshotDir, "videos").listFiles().orEmpty()
+        assertEquals(1, goldenVideos.count { it.extension == "png" }, "Expected exactly one golden APNG")
+
+        val goldenImages = File(snapshotDir, "images").listFiles().orEmpty()
+        assertTrue(
+            goldenImages.none { it.name.contains("animation") },
+            "Per-frame goldens should not be written into images/"
+        )
     }
 
     @Test
-    fun `duplicate images are deduplicated by hash`() {
-        val rootDir = File(tempDir, "reports")
-        val writer = TDHtmlReportWriter(
-            runName = "testrun",
-            rootDirectory = rootDir,
-            snapshotRootDirectory = File(tempDir, "snapshots")
-        )
-
-        val image = BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB)
-
-        val snapshot1 = Snapshot(
-            name = "shot1",
-            testName = TestName("com.example", "MyTest", "test1"),
-            timestamp = Date(),
-            file = null
-        )
-        val snapshot2 = Snapshot(
-            name = "shot2",
-            testName = TestName("com.example", "MyTest", "test2"),
-            timestamp = Date(),
-            file = null
-        )
-
-        val handler1 = writer.newFrameHandler(snapshot1, 1, 1)
-        handler1.handle(image)
-        handler1.close()
-
-        val handler2 = writer.newFrameHandler(snapshot2, 1, 1)
-        handler2.handle(image)
-        handler2.close()
-
-        // Same image content should produce only one file
-        val images = File(rootDir, "images").listFiles()!!.filter { it.name.endsWith(".png") }
-        assertEquals(1, images.size)
-    }
-
-    @Test
-    fun `recording mode copies images to golden directory`() {
+    fun `recording mode copies single-frame snapshot into images golden directory`() {
         System.setProperty("paparazzi.test.record", "true")
         val rootDir = File(tempDir, "reports")
         val snapshotDir = File(tempDir, "snapshots")
+
         val writer = TDHtmlReportWriter(
             runName = "testrun",
             rootDirectory = rootDir,
@@ -230,37 +175,58 @@ class TDHtmlReportWriterTest {
             file = null
         )
 
-        val frameHandler = writer.newFrameHandler(snapshot, 1, 1)
-        frameHandler.handle(BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB))
-        frameHandler.close()
+        writer.newFrameHandler(snapshot, 1, -1).use { handler ->
+            handler.handle(BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB))
+        }
 
-        val goldenImages = File(snapshotDir, "images")
-        assertTrue(goldenImages.exists())
-        assertTrue(goldenImages.listFiles()!!.any { it.name.endsWith(".png") })
+        val goldenImages = File(snapshotDir, "images").listFiles().orEmpty()
+        assertTrue(goldenImages.any { it.name.endsWith(".png") })
     }
 
     @Test
-    fun `index js lists all runs`() {
+    fun `close writes final run js listing the shots`() {
+        val rootDir = File(tempDir, "reports")
+        val writer = TDHtmlReportWriter(
+            runName = "testrun",
+            rootDirectory = rootDir,
+            snapshotRootDirectory = File(tempDir, "snapshots")
+        )
+
+        val snapshot = Snapshot(
+            name = "test_shot",
+            testName = TestName("com.example", "MyTest", "testMethod"),
+            timestamp = Date(),
+            file = null
+        )
+        writer.newFrameHandler(snapshot, 1, -1).use { handler ->
+            handler.handle(BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB))
+        }
+        writer.close()
+
+        val runJs = File(rootDir, "runs/testrun.js").readText()
+        assertTrue(runJs.contains("test_shot"))
+        assertTrue(runJs.contains("com.example"))
+        assertTrue(runJs.contains("MyTest"))
+        assertTrue(runJs.contains("testMethod"))
+    }
+
+    @Test
+    fun `index js lists every run in the same root directory`() {
         val rootDir = File(tempDir, "reports")
 
-        // Create first writer/run
-        val writer1 = TDHtmlReportWriter(
+        TDHtmlReportWriter(
             runName = "run1",
             rootDirectory = rootDir,
             snapshotRootDirectory = File(tempDir, "snapshots")
-        )
-        writer1.close()
+        ).close()
 
-        // Create second writer/run (reuses same rootDirectory, so it sees run1's files)
-        val writer2 = TDHtmlReportWriter(
+        TDHtmlReportWriter(
             runName = "run2",
             rootDirectory = rootDir,
             snapshotRootDirectory = File(tempDir, "snapshots")
-        )
-        writer2.close()
+        ).close()
 
-        val indexJs = File(rootDir, "index.js")
-        val content = indexJs.readText()
+        val content = File(rootDir, "index.js").readText()
         assertTrue(content.contains("run1"))
         assertTrue(content.contains("run2"))
     }

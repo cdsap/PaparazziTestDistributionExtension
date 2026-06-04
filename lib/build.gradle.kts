@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.4.0"
+version = "0.5.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -17,12 +17,6 @@ java {
 
 dependencies {
     compileOnly("app.cash.paparazzi:paparazzi:2.0.0-alpha02")
-    implementation("com.squareup.okio:okio:3.1.0")
-    implementation("com.google.guava:guava:31.1-jre")
-    implementation("org.jcodec:jcodec-javase:0.2.5")
-    implementation("com.squareup.moshi:moshi-adapters:1.15.2")
-    implementation("com.squareup.moshi:moshi:1.15.2")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 
     testImplementation("app.cash.paparazzi:paparazzi:2.0.0-alpha02")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
@@ -69,7 +63,7 @@ mavenPublishing {
     if (project.findProperty("signing.keyId") != null) {
         signAllPublications()
     }
-    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.4.0")
+    coordinates("io.github.cdsap", "td-paparazzi-ext", "0.5.0-SNAPSHOT")
 
     pom {
         scm {
