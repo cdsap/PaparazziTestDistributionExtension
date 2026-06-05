@@ -47,14 +47,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "AGP 8.13 + Paparazzi alpha02 (published 0.4.0)"
+          - name: "AGP 8.13 + Paparazzi alpha02 (published 0.4.0, TD)"
             project-dir: "integration-test/agp8"
-            slug: "agp8-published"
+            slug: "agp8-published-td"
             use-local-publish: false
-          - name: "AGP 9.0 + Paparazzi alpha04 (local 0.5.0-SNAPSHOT)"
+            td-enabled: true
+          - name: "AGP 8.13 + Paparazzi alpha02 (published 0.4.0, no TD)"
+            project-dir: "integration-test/agp8"
+            slug: "agp8-published-notd"
+            use-local-publish: false
+            td-enabled: false
+          - name: "AGP 9.0 + Paparazzi alpha04 (local 0.5.0-SNAPSHOT, TD)"
             project-dir: "integration-test/agp9"
-            slug: "agp9-local"
+            slug: "agp9-local-td"
             use-local-publish: true
+            td-enabled: true
+          - name: "AGP 9.0 + Paparazzi alpha04 (local 0.5.0-SNAPSHOT, no TD)"
+            project-dir: "integration-test/agp9"
+            slug: "agp9-local-notd"
+            use-local-publish: true
+            td-enabled: false
 
     runs-on: ubuntu-latest
     name: "integration (${{ matrix.name }})"
@@ -78,7 +90,7 @@ jobs:
 
       - name: Run integration test
         working-directory: ${{ matrix.project-dir }}
-        run: ./gradlew :app:recordPaparazziDebug --stacktrace
+        run: ./gradlew :app:recordPaparazziDebug --stacktrace -Ptd.enabled=${{ matrix.td-enabled }}
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_TMP_KEY }}
 

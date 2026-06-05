@@ -38,12 +38,16 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+val tdEnabled = (project.findProperty("td.enabled") as? String)?.toBoolean() ?: false
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-    develocity {
-        testDistribution {
-            enabled.set(true)
-            maxLocalExecutors.set(0)
+    if (tdEnabled) {
+        develocity {
+            testDistribution {
+                enabled.set(true)
+                maxLocalExecutors.set(0)
+            }
         }
     }
    inputs.dir(layout.buildDirectory.dir("intermediates/paparazzi"))
