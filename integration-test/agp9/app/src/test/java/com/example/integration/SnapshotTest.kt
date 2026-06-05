@@ -1,17 +1,12 @@
 package com.example.integration
 
 import android.widget.ProgressBar
-import app.cash.paparazzi.Paparazzi
-import io.github.cdsap.td.paparazzi.tdSnapshotHandler
 import org.junit.Rule
 import org.junit.Test
 
 class SnapshotTest {
     @get:Rule
-    val paparazzi = Paparazzi(
-        // Comment this out to see the expected snapshot.gif output
-        snapshotHandler = tdSnapshotHandler()
-    )
+    val paparazzi = paparazzi()
 
     @Test
     fun snapshot() {

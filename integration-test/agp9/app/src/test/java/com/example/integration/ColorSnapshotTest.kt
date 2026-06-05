@@ -1,14 +1,12 @@
 package com.example.integration
 
 import androidx.compose.ui.graphics.Color
-import app.cash.paparazzi.Paparazzi
-import io.github.cdsap.td.paparazzi.tdSnapshotHandler
 import org.junit.Rule
 import org.junit.Test
 
 class ColorSnapshotTest {
     @get:Rule
-    val paparazzi = Paparazzi(snapshotHandler = tdSnapshotHandler())
+    val paparazzi = paparazzi()
 
     @Test
     fun red() {

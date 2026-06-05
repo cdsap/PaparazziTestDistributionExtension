@@ -42,6 +42,7 @@ val tdEnabled = (project.findProperty("td.enabled") as? String)?.toBoolean() ?: 
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    systemProperty("td.enabled", tdEnabled.toString())
     if (tdEnabled) {
         develocity {
             testDistribution {
