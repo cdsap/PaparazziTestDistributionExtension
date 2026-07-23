@@ -75,6 +75,6 @@ jobs:
 
       - name: Run integration test (resolve from Maven Local)
         working-directory: ${{ matrix.project-dir }}
-        run: ./gradlew :app:recordPaparazziDebug --stacktrace
+        run: ./gradlew :app:verifyPaparazziTestInputs :app:recordPaparazziDebug --stacktrace
         env:
             DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
