@@ -82,6 +82,12 @@ recording (HTML report) and verification modes based on system properties. Since
 only provides the handler, it works with any Paparazzi version regardless of constructor
 changes.
 
+The plugin also declares the inputs Paparazzi reads at render time on each variant's
+unit-test task, so Test Distribution ships them to remote agents and the build cache key
+stays correct (`paparazzi.td.intermediates`, `paparazzi.layoutlib.resources`, and
+`paparazzi.aar.resource.dirs`). These are derived from the AGP variant model, so no manual
+`inputs` wiring is required with the plugin.
+
 The plugin can be configured via the `tdPaparazzi` extension:
 
 ```kotlin
@@ -110,7 +116,10 @@ testImplementation("io.github.cdsap:td-paparazzi-ext:0.6.0")
 ```
 
 Use `tdSnapshotHandler()` in your tests (same as above), then configure Test Distribution
-inputs/outputs and define the merge task manually:
+inputs/outputs and define the merge task manually. Note that the plugin (Option 1) also
+declares the Paparazzi render inputs (`intermediates/paparazzi/<variant>`, layoutlib
+resources, and AAR android-res dirs) required for correct remote execution and caching;
+the snippet below is a minimal starting point and does not reproduce that full input set:
 
 ```kotlin
 tasks.withType<Test>().configureEach {
