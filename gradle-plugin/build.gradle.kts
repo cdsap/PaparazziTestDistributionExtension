@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.5.0"
+version = "0.6.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
