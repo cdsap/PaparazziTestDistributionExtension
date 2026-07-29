@@ -1,3 +1,4 @@
+import com.gradle.develocity.agent.gradle.test.DevelocityTestConfiguration
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 
@@ -37,6 +38,16 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    // Route unit tests (incl. the testDebugUnitTest that recordPaparazziDebug drives) to remote
+    // Develocity Test Distribution agents, to validate the Paparazzi TD wiring end-to-end against
+    // the configured instance. maxLocalExecutors = 0 forces remote so agent execution is exercised.
+    extensions.configure<DevelocityTestConfiguration> {
+        testDistribution {
+            enabled.set(true)
+            maxLocalExecutors.set(0)
+            maxRemoteExecutors.set(1)
+        }
+    }
 }
 
 // Functional check for the io.github.cdsap.td.paparazzi plugin: in a real AGP + Paparazzi build

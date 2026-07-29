@@ -1,3 +1,4 @@
+import com.gradle.develocity.agent.gradle.test.DevelocityTestConfiguration
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 
@@ -43,6 +44,16 @@ tasks.withType<Test>().configureEach {
         showCauses = true
         showStackTraces = true
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+    // Route unit tests (incl. the testDebugUnitTest that recordPaparazziDebug drives) to remote
+    // Develocity Test Distribution agents, to validate the Paparazzi TD wiring end-to-end against
+    // the configured instance. maxLocalExecutors = 0 forces remote so agent execution is exercised.
+    extensions.configure<DevelocityTestConfiguration> {
+        testDistribution {
+            enabled.set(true)
+            maxLocalExecutors.set(0)
+            maxRemoteExecutors.set(1)
+        }
     }
 }
 
