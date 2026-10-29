@@ -94,7 +94,7 @@ The plugin can be configured via the `tdPaparazzi` extension:
 tdPaparazzi {
     inputReportDir.set("build/reports/paparazzi")      // default
     outputReportDir.set("build/reports/paparazzi-td")   // default
-    libraryVersion.set("0.6.0")                         // default
+    libraryVersion.set("0.6.1")                         // default
     cleanupTdDirectories.set(false)                     // default
 }
 ```
@@ -112,7 +112,7 @@ both target the same directory. Override `inputReportDir` to relocate the per-ex
 Add the library dependency:
 
 ```kotlin
-testImplementation("io.github.cdsap:td-paparazzi-ext:0.6.0")
+testImplementation("io.github.cdsap:td-paparazzi-ext:0.6.1")
 ```
 
 Use `tdSnapshotHandler()` in your tests (same as above), then configure Test Distribution
