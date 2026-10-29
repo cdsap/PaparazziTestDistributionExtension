@@ -107,19 +107,15 @@ internal object AndroidVariantConfigurator {
         // 2. layoutlib resources — a single project-level configuration created by the
         //    Paparazzi plugin (not per-variant). Guarded because it only exists once Paparazzi
         //    has been configured.
-        project.configurations.findByName("layoutlibResources")?.let { layoutlibResources ->
-            val layoutlibDirs = layoutlibResources.incoming.artifactView { view ->
-                view.attributes.attribute(
-                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
-                    ArtifactTypeDefinition.DIRECTORY_TYPE,
-                )
-            }.files
-            testTask.inputs.files(layoutlibDirs)
-                .withPropertyName("paparazzi.layoutlib.resources")
-                .withPathSensitivity(PathSensitivity.NONE)
-        }
+        registerUnzippedConfiguration(project, testTask, "layoutlibResources", "paparazzi.layoutlib.resources")
 
-        // 3. android-res directories contributed by external AAR dependencies on the variant
+        // 3. layoutlib native runtime — also project-level. Paparazzi passes its unzipped path to
+        //    the test JVM as a system property; 2.0.0-alpha05 stopped declaring it as a file input
+        //    (it now only tracks the version), so without this TD agents fail on a missing
+        //    `build.prop` under the transformed `layoutlib-runtime-*` directory.
+        registerUnzippedConfiguration(project, testTask, "layoutlibRuntime", "paparazzi.layoutlib.runtime")
+
+        // 4. android-res directories contributed by external AAR dependencies on the variant
         //    runtime classpath. lenient(true) tolerates partially-resolvable graphs; the
         //    component filter drops project dependencies (tracked via task deps instead).
         val aarResourceDirs = runtimeConfiguration.incoming.artifactView { view ->
@@ -130,6 +126,27 @@ internal object AndroidVariantConfigurator {
         testTask.inputs.files(aarResourceDirs)
             .withPropertyName("paparazzi.aar.resource.dirs")
             .withPathSensitivity(PathSensitivity.NONE)
+    }
+
+    // Declares the unzipped (directory) artifacts of a Paparazzi-created configuration as test
+    // inputs. Guarded because the configuration only exists once Paparazzi has been configured.
+    private fun registerUnzippedConfiguration(
+        project: Project,
+        testTask: Test,
+        configurationName: String,
+        propertyName: String,
+    ) {
+        project.configurations.findByName(configurationName)?.let { configuration ->
+            val dirs = configuration.incoming.artifactView { view ->
+                view.attributes.attribute(
+                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                    ArtifactTypeDefinition.DIRECTORY_TYPE,
+                )
+            }.files
+            testTask.inputs.files(dirs)
+                .withPropertyName(propertyName)
+                .withPathSensitivity(PathSensitivity.NONE)
+        }
     }
 
     internal const val TD_REPORT_DIR_SYSTEM_PROPERTY = "paparazzi.td.report.dir"

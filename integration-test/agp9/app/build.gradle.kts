@@ -58,6 +58,14 @@ tasks.register("verifyPaparazziTestInputs") {
             )
         }.files
     }
+    val layoutlibRuntime = configurations.named("layoutlibRuntime").map { cfg ->
+        cfg.incoming.artifactView {
+            attributes.attribute(
+                ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                ArtifactTypeDefinition.DIRECTORY_TYPE,
+            )
+        }.files
+    }
     val aarResourceDirs = configurations.named("debugRuntimeClasspath").map { cfg ->
         cfg.incoming.artifactView {
             attributes.attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "android-res")
@@ -85,6 +93,11 @@ tasks.register("verifyPaparazziTestInputs") {
             "testDebugUnitTest does not declare the layoutlib resource inputs; expected $layoutlib"
         }
 
+        val runtime = layoutlibRuntime.get().toList()
+        require(runtime.isNotEmpty() && runtime.all { declaresUnder(it) }) {
+            "testDebugUnitTest does not declare the layoutlib native runtime inputs; expected $runtime"
+        }
+
         val aarRes = aarResourceDirs.get().toList()
         require(aarRes.all { declaresUnder(it) }) {
             "testDebugUnitTest does not declare the AAR android-res inputs; expected $aarRes"
@@ -92,6 +105,7 @@ tasks.register("verifyPaparazziTestInputs") {
 
         println(
             "PAPARAZZI_TD_INPUTS_OK: intermediates + ${layoutlib.size} layoutlib + " +
+                "${runtime.size} layoutlib-runtime + " +
                 "${aarRes.size} aar-res inputs declared on testDebugUnitTest"
         )
     }

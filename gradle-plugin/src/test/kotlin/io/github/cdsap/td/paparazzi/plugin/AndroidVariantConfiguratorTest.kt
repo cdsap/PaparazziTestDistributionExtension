@@ -86,13 +86,41 @@ class AndroidVariantConfiguratorTest {
     }
 
     @JTest
-    fun `registerRemoteExecutionInputs does not fail when layoutlibResources is absent`() {
+    fun `registerRemoteExecutionInputs declares the unzipped layoutlib native runtime`() {
         val project = ProjectBuilder.builder().build()
         val testTask = project.tasks.create("testDebugUnitTest", Test::class.java)
         val runtimeClasspath = project.configurations.create("debugRuntimeClasspath")
 
-        // No layoutlibResources configuration created — the guarded lookup must simply skip it
-        // rather than throw.
+        // Paparazzi 2.0.0-alpha05 no longer declares this directory as an input, yet still passes
+        // its absolute path to the test JVM — remote agents then fail to find `build.prop` in it.
+        val nativeRuntime = project.layout.buildDirectory
+            .dir("layoutlib-runtime-16.2.1-linux").get().asFile
+        nativeRuntime.mkdirs()
+        project.configurations.create("layoutlibRuntime")
+        project.dependencies.add("layoutlibRuntime", project.files(nativeRuntime))
+
+        AndroidVariantConfigurator.registerRemoteExecutionInputs(
+            project,
+            testTask,
+            variantName = "debug",
+            runtimeConfiguration = runtimeClasspath,
+        )
+
+        assertTrue(
+            testTask.inputs.files.files.contains(nativeRuntime),
+            "Expected the layoutlib native runtime to be a declared input; " +
+                "got: ${testTask.inputs.files.files}",
+        )
+    }
+
+    @JTest
+    fun `registerRemoteExecutionInputs does not fail when layoutlib configurations are absent`() {
+        val project = ProjectBuilder.builder().build()
+        val testTask = project.tasks.create("testDebugUnitTest", Test::class.java)
+        val runtimeClasspath = project.configurations.create("debugRuntimeClasspath")
+
+        // Neither layoutlibResources nor layoutlibRuntime created — the guarded lookups must
+        // simply skip them rather than throw.
         assertDoesNotThrow {
             AndroidVariantConfigurator.registerRemoteExecutionInputs(
                 project,
