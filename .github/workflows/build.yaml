@@ -23,6 +23,8 @@ jobs:
 
       - name: Run Library Tests
         run: ./gradlew :lib:test
+        env:
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_API_KEY }}
 
       - name: Run Paparazzi Compatibility Tests
         run: ./gradlew :lib:testPaparazziCompatAll
