@@ -58,5 +58,5 @@ gradlePlugin {
 pluginBundle {
     website = "https://github.com/cdsap/PaparazziTestDistributionExtension"
     vcsUrl = "https://github.com/cdsap/PaparazziTestDistributionExtension"
-    tags = listOf("Develocity", "Test Distribution", "Paparazzi")
+    tags = listOf("Develocity", "test-distribution", "Paparazzi")
 }
